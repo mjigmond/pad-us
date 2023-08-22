@@ -45,16 +45,6 @@ def percent_coverage(aoi_url: str, groupby: Union[str, None] = None) -> dict:
     if not aoi_past_request:
         aoi_df.to_postgis(aoi_table_name, engine, PAD_REQUESTS_SCHEMA)
 
-    engine = get_engine("pad_us")
-    aoi_df = parse_geojson(aoi_url)
-    if aoi_df.empty:
-        return {"Failure": "Unable to process AOI GeoJSON"}
-    aoi_df_hash = pd.util.hash_pandas_object(aoi_df).sum()
-    aoi_past_request = past_request(aoi_df_hash)
-    aoi_table_name = f"t_{aoi_df_hash}"
-    if not aoi_past_request:
-        aoi_df.to_postgis(aoi_table_name, engine, PAD_REQUESTS_SCHEMA)
-
     create_compute_table(aoi_table_name)
     compute_overlap(aoi_table_name)
 
